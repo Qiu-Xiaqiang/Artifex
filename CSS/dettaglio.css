@@ -1,0 +1,56 @@
+.tour-image {
+    height: 400px;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.evento-card {
+    border-left: 4px solid #0d6efd;
+    margin-bottom: 1rem;
+    transition: transform 0.3s;
+}
+
+.evento-card:hover {
+    transform: translateY(-5px);
+}
+
+.prenotazione-card {
+    position: sticky;
+    top: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.feature-icon {
+    width: 4rem;
+    height: 4rem;
+    border-radius: 0.75rem;
+    background-color: #f8f9fa;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.feature-icon i {
+    font-size: 2rem;
+    color: #0d6efd;
+}
+
+#evento-select {
+    border: 2px solid #0d6efd;
+}
+
+.badge-custom {
+    font-size: 0.9rem;
+    padding: 0.5rem;
+}
+
+.testimonial {
+    font-style: italic;
+    padding: 1.5rem;
+    background-color: #f8f9fa;
+    border-left: 4px solid #0d6efd;
+    margin: 2rem 0;
+}
