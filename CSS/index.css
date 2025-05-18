@@ -38,15 +38,6 @@ h1, h2, h3, h4, h5 {
     color: var(--accent-color) !important;
 }
 
-.hero {
-    background-image: url('https://images.unsplash.com/photo-1530127796739-53cf66ce1fcd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
-    background-size: cover;
-    background-position: center;
-    color: white;
-    padding: 12rem 0;
-    position: relative;
-}
-
 .hero::before {
     content: "";
     position: absolute;
