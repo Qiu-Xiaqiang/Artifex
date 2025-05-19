@@ -45,13 +45,17 @@ if (isset($_SESSION['success_message'])) {
 <body>
 <?php include 'PageComponenti/header.php'; ?>
 
-<!-- Hero Section -->
-<section class="hero" style="background-image: url('Immagini/home.jpg');">
-    <div class="container hero-content text-center">
+<div class="hero-image-container">
+    <img src="Immagini/home.jpg" alt="Artifex Hero" class="hero-background-image">
+</div>
+
+<!-- Contenuto Hero sotto l'immagine -->
+<section class="hero-content-section py-5 bg-primary text-white">
+    <div class="container text-center">
         <h1 class="fade-in">Scopri l'Arte e la Storia con Artifex</h1>
         <p class="lead mb-4 fade-in delay-1">Visite guidate esclusive nei più importanti siti culturali in Italia</p>
         <div class="fade-in delay-2">
-            <a href="visite.php" class="btn btn-primary btn-lg me-2">Esplora le Visite</a>
+            <a href="visite.php" class="btn btn-light btn-lg me-2">Esplora le Visite</a>
             <?php if (!$logged_in): ?>
                 <a href="registrazione.php" class="btn btn-outline-light btn-lg">Registrati Ora</a>
             <?php endif; ?>
