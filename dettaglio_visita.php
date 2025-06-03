@@ -51,7 +51,7 @@ if (!$visita) {
 $sql_eventi = "SELECT e.eid, e.inizio, e.minimo_partecipanti, e.massimo_partecipanti, 
               e.prezzo, g.nome as guida_nome, g.cognome as guida_cognome, 
               l.lingua,
-              (SELECT COUNT(*) FROM ordini o WHERE o.id_evento = e.eid) as posti_prenotati
+              (SELECT COALESCE(SUM(o.quantita), 0) FROM ordini o WHERE o.id_evento = e.eid) as posti_prenotati
               FROM eventi e
               JOIN illustrazioni i ON e.eid = i.id_evento
               JOIN guide g ON i.id_guida = g.gid
@@ -95,19 +95,37 @@ $messaggio = '';
 $tipo_messaggio = '';
 
 if (isset($_POST['aggiungi_carrello']) && $logged_in) {
-    $evento_id = (int)$_POST['evento_id'];
-    $quantita = (int)$_POST['quantita'];
-    $user_id = $_SESSION['user_id'];
+    try {
+        $evento_id = (int)$_POST['evento_id'];
+        $quantita = (int)$_POST['quantita'];
+        $user_id = $_SESSION['user_id'];
 
-    // Verifica se l'evento esiste e ha posti disponibili
-    $sql_check = "SELECT e.eid, e.massimo_partecipanti, 
-                 (SELECT COUNT(*) FROM ordini o WHERE o.id_evento = e.eid) as posti_prenotati
-                 FROM eventi e WHERE e.eid = ?";
-    $stmt_check = $db->prepare($sql_check);
-    $stmt_check->execute([$evento_id]);
-    $evento = $stmt_check->fetch(PDO::FETCH_OBJ);
+        // Verifica se l'utente esiste nella tabella account
+        $sql_user_check = "SELECT aid FROM account WHERE aid = ?";
+        $stmt_user_check = $db->prepare($sql_user_check);
+        $stmt_user_check->execute([$user_id]);
+        $user_exists = $stmt_user_check->fetch(PDO::FETCH_OBJ);
 
-    if ($evento && ($evento->posti_prenotati + $quantita) <= $evento->massimo_partecipanti) {
+        if (!$user_exists) {
+            throw new Exception("Errore: utente non trovato nel sistema.");
+        }
+
+        // Verifica se l'evento esiste e ha posti disponibili
+        $sql_check = "SELECT e.eid, e.massimo_partecipanti, 
+                     (SELECT COALESCE(SUM(o.quantita), 0) FROM ordini o WHERE o.id_evento = e.eid) as posti_prenotati
+                     FROM eventi e WHERE e.eid = ?";
+        $stmt_check = $db->prepare($sql_check);
+        $stmt_check->execute([$evento_id]);
+        $evento = $stmt_check->fetch(PDO::FETCH_OBJ);
+
+        if (!$evento) {
+            throw new Exception("Evento non trovato.");
+        }
+
+        if (($evento->posti_prenotati + $quantita) > $evento->massimo_partecipanti) {
+            throw new Exception("Non ci sono abbastanza posti disponibili per questo evento.");
+        }
+
         // Controlla se l'evento è già nel carrello
         $sql_carrello_check = "SELECT cid, quantita FROM carrello WHERE id_evento = ? AND id_turista = ?";
         $stmt_carrello_check = $db->prepare($sql_carrello_check);
@@ -127,34 +145,62 @@ if (isset($_POST['aggiungi_carrello']) && $logged_in) {
             $risultato = $stmt_insert->execute([$evento_id, $user_id, $quantita]);
         }
 
-        if (isset($risultato) && $risultato) {
+        if ($risultato) {
             $messaggio = "Evento aggiunto al carrello con successo!";
             $tipo_messaggio = "success";
         } else {
-            $messaggio = "Errore durante l'aggiunta al carrello.";
-            $tipo_messaggio = "danger";
+            throw new Exception("Errore durante l'aggiunta al carrello.");
         }
-    } else {
-        $messaggio = "Non ci sono abbastanza posti disponibili per questo evento.";
-        $tipo_messaggio = "warning";
+
+    } catch (Exception $e) {
+        $messaggio = $e->getMessage();
+        $tipo_messaggio = "danger";
     }
 }
 
 // Gestione della prenotazione diretta
 if (isset($_POST['prenota_ora']) && $logged_in) {
-    $evento_id = (int)$_POST['evento_id'];
-    $quantita = (int)$_POST['quantita'];
-    $user_id = $_SESSION['user_id'];
+    try {
+        $evento_id = (int)$_POST['evento_id'];
+        $quantita = (int)$_POST['quantita'];
+        $user_id = $_SESSION['user_id'];
 
-    // Verifica se l'evento esiste e ha posti disponibili
-    $sql_check = "SELECT e.eid, e.massimo_partecipanti, 
-                 (SELECT COUNT(*) FROM ordini o WHERE o.id_evento = e.eid) as posti_prenotati
-                 FROM eventi e WHERE e.eid = ?";
-    $stmt_check = $db->prepare($sql_check);
-    $stmt_check->execute([$evento_id]);
-    $evento = $stmt_check->fetch(PDO::FETCH_OBJ);
+        // Verifica se l'utente esiste nella tabella account
+        $sql_user_check = "SELECT aid FROM account WHERE aid = ?";
+        $stmt_user_check = $db->prepare($sql_user_check);
+        $stmt_user_check->execute([$user_id]);
+        $user_exists = $stmt_user_check->fetch(PDO::FETCH_OBJ);
 
-    if ($evento && ($evento->posti_prenotati + $quantita) <= $evento->massimo_partecipanti) {
+        if (!$user_exists) {
+            throw new Exception("Errore: utente non trovato nel sistema.");
+        }
+
+        // Verifica se l'evento esiste e ha posti disponibili
+        $sql_check = "SELECT e.eid, e.massimo_partecipanti, 
+                     (SELECT COALESCE(SUM(o.quantita), 0) FROM ordini o WHERE o.id_evento = e.eid) as posti_prenotati
+                     FROM eventi e WHERE e.eid = ?";
+        $stmt_check = $db->prepare($sql_check);
+        $stmt_check->execute([$evento_id]);
+        $evento = $stmt_check->fetch(PDO::FETCH_OBJ);
+
+        if (!$evento) {
+            throw new Exception("Evento non trovato.");
+        }
+
+        if (($evento->posti_prenotati + $quantita) > $evento->massimo_partecipanti) {
+            throw new Exception("Non ci sono abbastanza posti disponibili per questo evento.");
+        }
+
+        // Verifica se l'utente ha già prenotato questo evento
+        $sql_ordine_check = "SELECT oid FROM ordini WHERE id_evento = ? AND id_turista = ?";
+        $stmt_ordine_check = $db->prepare($sql_ordine_check);
+        $stmt_ordine_check->execute([$evento_id, $user_id]);
+        $ordine_esistente = $stmt_ordine_check->fetch(PDO::FETCH_OBJ);
+
+        if ($ordine_esistente) {
+            throw new Exception("Hai già prenotato questo evento.");
+        }
+
         // Inserisci direttamente nell'ordine
         $sql_insert = "INSERT INTO ordini (id_evento, id_turista, data, quantita) VALUES (?, ?, NOW(), ?)";
         $stmt_insert = $db->prepare($sql_insert);
@@ -163,13 +209,18 @@ if (isset($_POST['prenota_ora']) && $logged_in) {
         if ($risultato) {
             $messaggio = "Prenotazione effettuata con successo!";
             $tipo_messaggio = "success";
+
+            // Aggiorna i dati degli eventi per riflettere la nuova prenotazione
+            $stmt_eventi = $db->prepare($sql_eventi);
+            $stmt_eventi->execute([$visita_id]);
+            $eventi = $stmt_eventi->fetchAll(PDO::FETCH_OBJ);
         } else {
-            $messaggio = "Errore durante la prenotazione.";
-            $tipo_messaggio = "danger";
+            throw new Exception("Errore durante la prenotazione.");
         }
-    } else {
-        $messaggio = "Non ci sono abbastanza posti disponibili per questo evento.";
-        $tipo_messaggio = "warning";
+
+    } catch (Exception $e) {
+        $messaggio = $e->getMessage();
+        $tipo_messaggio = "danger";
     }
 }
 ?>
@@ -333,6 +384,7 @@ if (isset($_POST['prenota_ora']) && $logged_in) {
                                                 data-posti="<?php echo $posti_disponibili; ?>"
                                                 data-lingua="<?php echo htmlspecialchars($evento->lingua); ?>">
                                             <?php echo $data_formattata; ?> - <?php echo htmlspecialchars($evento->lingua); ?>
+                                            <?php if ($posti_disponibili <= 0): ?> (SOLD OUT)<?php endif; ?>
                                         </option>
                                     <?php endforeach; ?>
                                 </select>
