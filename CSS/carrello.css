@@ -1,0 +1,134 @@
+.carrello-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.evento-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.evento-card:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+
+.evento-info h5 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+.badge-custom {
+    background-color: #f8f9fa;
+    color: #495057;
+    border: 1px solid #dee2e6;
+}
+
+.prezzo-evento {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #27ae60;
+}
+
+.totale-section {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 25px;
+    margin-top: 30px;
+    border: 2px solid #e9ecef;
+}
+
+.totale-finale {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.payment-form {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    margin-top: 30px;
+}
+
+.form-control:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+}
+
+.btn-checkout {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    border: none;
+    padding: 12px 30px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+}
+
+.btn-checkout:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(52, 152, 219, 0.3);
+}
+
+.empty-cart {
+    text-align: center;
+    padding: 60px 20px;
+    color: #6c757d;
+}
+
+.empty-cart i {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    color: #dee2e6;
+}
+
+.quantita-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.quantita-btn {
+    width: 35px;
+    height: 35px;
+    border: 1px solid #dee2e6;
+    background: white;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.quantita-btn:hover {
+    background: #f8f9fa;
+    border-color: #3498db;
+}
+
+.quantita-input {
+    width: 60px;
+    text-align: center;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    padding: 6px;
+}
+
+.security-info {
+    background: #e8f5e8;
+    border: 1px solid #d4edda;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.security-info i {
+    color: #28a745;
+}
